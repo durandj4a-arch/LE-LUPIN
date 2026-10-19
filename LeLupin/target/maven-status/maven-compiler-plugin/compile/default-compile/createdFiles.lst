@@ -1,0 +1,5 @@
+com\lelupin\conexion\Conexion.class
+com\lelupin\lelupin\JakartaRestConfiguration.class
+com\lelupin\controller\SvLogin.class
+com\lelupin\dao\UsuarioDao.class
+com\lelupin\lelupin\resources\JakartaEE11Resource.class
