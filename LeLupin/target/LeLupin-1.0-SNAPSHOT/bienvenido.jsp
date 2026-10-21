@@ -9,7 +9,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Le Lupin - Panel de Ventas e Inventario</title>
+    <title>Le Lupin - Panel de Control</title>
     <style>
         body {
             margin: 0;
@@ -47,8 +47,8 @@
             color: #16221f;
         }
         .main-container {
-            max-width: 900px;
-            margin: 40px auto;
+            max-width: 950px;
+            margin: 30px auto;
             padding: 30px;
             background: white;
             border-radius: 8px;
@@ -57,33 +57,63 @@
             width: 100%;
             box-sizing: border-box;
         }
-        h2 {
-            font-family: serif;
+
+        .nav-tabs {
+            display: flex;
             border-bottom: 2px solid #16221f;
-            padding-bottom: 10px;
-            margin-top: 0;
-            color: #16221f;
+            margin-bottom: 25px;
         }
+        .tab-btn {
+            background: none;
+            border: none;
+            padding: 12px 24px;
+            font-size: 0.95rem;
+            font-weight: bold;
+            color: #666;
+            cursor: pointer;
+            border-radius: 4px 4px 0 0;
+            transition: all 0.2s;
+            width: auto;
+        }
+        .tab-btn.active {
+            background-color: #16221f;
+            color: #f5f2eb;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* Estilos de Formularios */
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 18px;
+        }
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+        .form-row .form-group {
+            flex: 1;
         }
         label {
             display: block;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             font-weight: bold;
             letter-spacing: 1px;
             color: #444;
             margin-bottom: 5px;
         }
-        input, select {
+        input {
             width: 100%;
             padding: 10px;
             border: 1px solid #ccc;
             border-radius: 4px;
-            font-size: 1rem;
+            font-size: 0.95rem;
             box-sizing: border-box;
         }
-        button {
+        .btn-submit {
             background-color: #16221f;
             color: white;
             border: none;
@@ -93,18 +123,40 @@
             border-radius: 4px;
             letter-spacing: 1px;
             width: 100%;
+            margin-top: 10px;
             transition: background 0.2s;
         }
-        button:hover {
+        .btn-submit:hover {
             background-color: #2b3d38;
         }
-        .success-msg {
-            background-color: #e2f0d9;
-            color: #385723;
+        
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        th, td {
             padding: 12px;
-            border-radius: 4px;
-            margin-bottom: 20px;
-            border: 1px solid #b7e1cd;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #16221f;
+            color: white;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+        }
+        tr:hover {
+            background-color: #f9f7f2;
+        }
+        .badge-stock {
+            background-color: #2e7d32;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: bold;
         }
     </style>
 </head>
@@ -116,34 +168,128 @@
     </header>
 
     <div class="main-container">
-        <h2>Módulo de Registro de Ventas (Cabecera y Detalle)</h2>
-        <p>Complete los datos para procesar una nueva venta de libros y actualizar el stock en TiDB Cloud.</p>
 
-        <!-- Formulario que conecta con un Servlet o lógica de procesamiento -->
-        <form action="SvVenta" method="POST">
-            <div class="form-group">
-                <label>NOMBRE DEL CLIENTE</label>
-                <input type="text" name="cliente" placeholder="Ej. Juan Pérez" required>
-            </div>
+        <div class="nav-tabs">
+            <button class="tab-btn active" onclick="showTab('catalogo')">📚 Catálogo de Libros</button>
+            <button class="tab-btn" onclick="showTab('registrar-libro')">➕ Registrar Nuevo Libro</button>
+            <button class="tab-btn" onclick="showTab('registrar-venta')">🛒 Registrar Venta</button>
+        </div>
 
-            <div class="form-group">
-                <label>ID DEL LIBRO (Catálogo)</label>
-                <input type="number" name="idLibro" placeholder="Ej. 1" required>
-            </div>
 
-            <div class="form-group">
-                <label>CANTIDAD</label>
-                <input type="number" name="cantidad" placeholder="Ej. 2" min="1" required>
-            </div>
+        <div id="catalogo" class="tab-content active">
+            <h2>Catálogo de Libros Disponibles</h2>
+            <p>Lista de ejemplares registrados en la base de datos de TiDB Cloud.</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>ISBN</th>
+                        <th>TÍTULO</th>
+                        <th>AUTOR</th>
+                        <th>PRECIO (S/)</th>
+                        <th>STOCK</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>1</strong></td>
+                        <td>978-8420653281</td>
+                        <td>Arsène Lupin, caballero ladrón</td>
+                        <td>Maurice Leblanc</td>
+                        <td>S/ 49.90</td>
+                        <td><span class="badge-stock">15 un.</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>2</strong></td>
+                        <td>978-8499890982</td>
+                        <td>La naranja mecánica</td>
+                        <td>Anthony Burgess</td>
+                        <td>S/ 42.50</td>
+                        <td><span class="badge-stock">10 un.</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
 
-            <div class="form-group">
-                <label>SUBTOTAL / TOTAL A PAGAR (S/)</label>
-                <input type="number" step="0.01" name="total" placeholder="Ej. 45.00" required>
-            </div>
 
-            <button type="submit">Registrar Venta en Sistema</button>
-        </form>
+        <div id="registrar-libro" class="tab-content">
+            <h2>Registrar Nuevo Libro al Catálogo</h2>
+            <p>Ingrese los datos bibliográficos para añadir una obra al inventario.</p>
+            <form action="SvLibro" method="POST">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>ISBN</label>
+                        <input type="text" name="isbn" placeholder="Ej. 978-1234567890" required>
+                    </div>
+                    <div class="form-group">
+                        <label>PRECIO (S/)</label>
+                        <input type="number" step="0.01" name="precio" placeholder="Ej. 35.00" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>TÍTULO DEL LIBRO</label>
+                    <input type="text" name="titulo" placeholder="Ej. El conde de Montecristo" required>
+                </div>
+                <div class="form-group">
+                    <label>AUTOR</label>
+                    <input type="text" name="autor" placeholder="Ej. Alexandre Dumas" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>STOCK INICIAL</label>
+                        <input type="number" name="stock" placeholder="Ej. 20" required>
+                    </div>
+                    <div class="form-group">
+                        <label>STOCK MÍNIMO</label>
+                        <input type="number" name="stockMinimo" placeholder="Ej. 3" required>
+                    </div>
+                </div>
+                <button type="submit" class="btn-submit">Añadir Libro a la Base de Datos</button>
+            </form>
+        </div>
+
+
+        <div id="registrar-venta" class="tab-content">
+            <h2>Módulo de Registro de Ventas (Cabecera y Detalle)</h2>
+            <p>Complete los datos para procesar una nueva venta y emitir la transacción.</p>
+            <form action="SvVenta" method="POST">
+                <div class="form-group">
+                    <label>NOMBRE DEL CLIENTE</label>
+                    <input type="text" name="cliente" placeholder="Ej. Juan Pérez" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>ID DEL LIBRO (Ver Catálogo)</label>
+                        <input type="number" name="idLibro" placeholder="Ej. 1" required>
+                    </div>
+                    <div class="form-group">
+                        <label>CANTIDAD</label>
+                        <input type="number" name="cantidad" placeholder="Ej. 2" min="1" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>TOTAL A PAGAR (S/)</label>
+                    <input type="number" step="0.01" name="total" placeholder="Ej. 99.80" required>
+                </div>
+                <button type="submit" class="btn-submit">Registrar Venta en Sistema</button>
+            </form>
+        </div>
     </div>
 
+    <script>
+        function showTab(tabId) {
+            // Ocultar todos los contenidos de pestañas
+            const contents = document.querySelectorAll('.tab-content');
+            contents.forEach(c => c.classList.remove('active'));
+
+            // Desactivar todos los botones de pestañas
+            const buttons = document.querySelectorAll('.tab-btn');
+            buttons.forEach(b => b.classList.remove('active'));
+
+            // Activar la pestaña y el botón seleccionados
+            document.getElementById(tabId).classList.add('active');
+            event.currentTarget.classList.add('active');
+        }
+    </script>
 </body>
 </html>
