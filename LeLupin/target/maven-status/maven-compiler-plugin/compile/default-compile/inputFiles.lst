@@ -3,3 +3,6 @@ C:\Users\Joshua\Documents\NetBeansProjects\LeLupin\src\main\java\com\lelupin\con
 C:\Users\Joshua\Documents\NetBeansProjects\LeLupin\src\main\java\com\lelupin\dao\UsuarioDao.java
 C:\Users\Joshua\Documents\NetBeansProjects\LeLupin\src\main\java\com\lelupin\lelupin\JakartaRestConfiguration.java
 C:\Users\Joshua\Documents\NetBeansProjects\LeLupin\src\main\java\com\lelupin\lelupin\resources\JakartaEE11Resource.java
+C:\Users\Joshua\Documents\NetBeansProjects\LeLupin\src\main\java\com\lelupin\model\Libro.java
+C:\Users\Joshua\Documents\NetBeansProjects\LeLupin\src\main\java\com\lelupin\repository\ILibroRepository.java
+C:\Users\Joshua\Documents\NetBeansProjects\LeLupin\src\main\java\com\lelupin\repository\LibroRepositoryImpl.java
