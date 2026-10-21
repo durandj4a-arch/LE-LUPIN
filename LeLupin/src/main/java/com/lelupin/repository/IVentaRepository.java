@@ -8,6 +8,11 @@ package com.lelupin.repository;
  *
  * @author Joshua
  */
-public class IVentaRepository {
-    
+import com.lelupin.model.Venta;
+import java.util.List;
+
+public interface IVentaRepository {
+    boolean registrarVenta(Venta venta);
+    Venta buscarPorId(int idVenta);
+    List<Venta> listarVentas();
 }
