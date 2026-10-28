@@ -1,5 +1,7 @@
 com\lelupin\conexion\Conexion.class
+com\lelupin\controller\SvVenta.class
 com\lelupin\repository\LibroRepositoryImpl.class
+com\lelupin\controller\SvLibro.class
 com\lelupin\repository\IVentaRepository.class
 com\lelupin\lelupin\JakartaRestConfiguration.class
 com\lelupin\lelupin\resources\JakartaEE11Resource.class

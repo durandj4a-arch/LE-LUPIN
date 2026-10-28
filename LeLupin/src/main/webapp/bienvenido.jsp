@@ -1,6 +1,6 @@
 <%-- 
     Document   : bienvenido
-    Created on : 7 oct. 2026, 11:53:10 p. m.
+    Created on : 7 oct. 2026, 11:53:10 p. m.
     Author     : Joshua
 --%>
 
@@ -9,7 +9,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Le Lupin - Panel de Control</title>
+    <title>Le Lupin — Panel de Control</title>
     <style>
         body {
             margin: 0;
@@ -57,7 +57,6 @@
             width: 100%;
             box-sizing: border-box;
         }
-
         .nav-tabs {
             display: flex;
             border-bottom: 2px solid #16221f;
@@ -85,8 +84,6 @@
         .tab-content.active {
             display: block;
         }
-        
-        /* Estilos de Formularios */
         .form-group {
             margin-bottom: 18px;
         }
@@ -105,7 +102,7 @@
             color: #444;
             margin-bottom: 5px;
         }
-        input {
+        input, select {
             width: 100%;
             padding: 10px;
             border: 1px solid #ccc;
@@ -129,8 +126,6 @@
         .btn-submit:hover {
             background-color: #2b3d38;
         }
-        
-
         table {
             width: 100%;
             border-collapse: collapse;
@@ -175,7 +170,6 @@
             <button class="tab-btn" onclick="showTab('registrar-venta')">🛒 Registrar Venta</button>
         </div>
 
-
         <div id="catalogo" class="tab-content active">
             <h2>Catálogo de Libros Disponibles</h2>
             <p>Lista de ejemplares registrados en la base de datos de TiDB Cloud.</p>
@@ -186,6 +180,7 @@
                         <th>ISBN</th>
                         <th>TÍTULO</th>
                         <th>AUTOR</th>
+                        <th>GÉNERO</th>
                         <th>PRECIO (S/)</th>
                         <th>STOCK</th>
                     </tr>
@@ -196,6 +191,7 @@
                         <td>978-8420653281</td>
                         <td>Arsène Lupin, caballero ladrón</td>
                         <td>Maurice Leblanc</td>
+                        <td>Novela</td>
                         <td>S/ 49.90</td>
                         <td><span class="badge-stock">15 un.</span></td>
                     </tr>
@@ -204,13 +200,13 @@
                         <td>978-8499890982</td>
                         <td>La naranja mecánica</td>
                         <td>Anthony Burgess</td>
+                        <td>Novela</td>
                         <td>S/ 42.50</td>
                         <td><span class="badge-stock">10 un.</span></td>
                     </tr>
                 </tbody>
             </table>
         </div>
-
 
         <div id="registrar-libro" class="tab-content">
             <h2>Registrar Nuevo Libro al Catálogo</h2>
@@ -230,9 +226,21 @@
                     <label>TÍTULO DEL LIBRO</label>
                     <input type="text" name="titulo" placeholder="Ej. El conde de Montecristo" required>
                 </div>
-                <div class="form-group">
-                    <label>AUTOR</label>
-                    <input type="text" name="autor" placeholder="Ej. Alexandre Dumas" required>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>AUTOR</label>
+                        <input type="text" name="autor" placeholder="Ej. Alexandre Dumas" required>
+                    </div>
+                    <div class="form-group">
+                        <label>GÉNERO / ETIQUETA</label>
+                        <select name="etiqueta" required>
+                            <option value="" disabled selected>Seleccione un género</option>
+                            <option value="manga">Manga</option>
+                            <option value="comic">Cómic</option>
+                            <option value="drama">Drama</option>
+                            <option value="novela">Novela</option>
+                        </select>
+                    </div>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
@@ -247,7 +255,6 @@
                 <button type="submit" class="btn-submit">Añadir Libro a la Base de Datos</button>
             </form>
         </div>
-
 
         <div id="registrar-venta" class="tab-content">
             <h2>Módulo de Registro de Ventas (Cabecera y Detalle)</h2>
@@ -278,15 +285,12 @@
 
     <script>
         function showTab(tabId) {
-            // Ocultar todos los contenidos de pestañas
             const contents = document.querySelectorAll('.tab-content');
             contents.forEach(c => c.classList.remove('active'));
 
-            // Desactivar todos los botones de pestañas
             const buttons = document.querySelectorAll('.tab-btn');
             buttons.forEach(b => b.classList.remove('active'));
 
-            // Activar la pestaña y el botón seleccionados
             document.getElementById(tabId).classList.add('active');
             event.currentTarget.classList.add('active');
         }

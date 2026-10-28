@@ -14,11 +14,17 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.lelupin.conexion.Conexion;
+import com.lelupin.model.Libro;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+
 public class LibroRepositoryImpl implements ILibroRepository {
 
     @Override
     public Libro save(Libro libro) {
-        String sql = "INSERT INTO libro (isbn, titulo, autor, precio, stock, stockMinimo) VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO libro (isbn, titulo, autor, precio, stock, stockMinimo, etiqueta) VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (Connection con = Conexion.getConexion();
              PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, libro.getIsbn());
@@ -27,6 +33,7 @@ public class LibroRepositoryImpl implements ILibroRepository {
             ps.setDouble(4, libro.getPrecio());
             ps.setInt(5, libro.getStock());
             ps.setInt(6, libro.getStockMinimo());
+            ps.setString(7, libro.getEtiqueta()); // Añadido para el género/etiqueta
             ps.executeUpdate();
             
             try (ResultSet rs = ps.getGeneratedKeys()) {
@@ -42,14 +49,56 @@ public class LibroRepositoryImpl implements ILibroRepository {
 
     @Override
     public Libro findById(int id) {
-
-        return null;
+        Libro libro = null;
+        String sql = "SELECT * FROM libro WHERE idLibro = ?";
+        try (Connection con = Conexion.getConexion();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    libro = new Libro(
+                        rs.getInt("idLibro"),
+                        rs.getString("isbn"),
+                        rs.getString("titulo"),
+                        rs.getString("autor"),
+                        rs.getDouble("precio"),
+                        rs.getInt("stock"),
+                        rs.getInt("stockMinimo"),
+                        rs.getString("etiqueta")
+                    );
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return libro;
     }
 
     @Override
     public Libro findByIsbn(String isbn) {
-
-        return null;
+        Libro libro = null;
+        String sql = "SELECT * FROM libro WHERE isbn = ?";
+        try (Connection con = Conexion.getConexion();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, isbn);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    libro = new Libro(
+                        rs.getInt("idLibro"),
+                        rs.getString("isbn"),
+                        rs.getString("titulo"),
+                        rs.getString("autor"),
+                        rs.getDouble("precio"),
+                        rs.getInt("stock"),
+                        rs.getInt("stockMinimo"),
+                        rs.getString("etiqueta")
+                    );
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return libro;
     }
 
     @Override
@@ -68,7 +117,36 @@ public class LibroRepositoryImpl implements ILibroRepository {
                         rs.getString("autor"),
                         rs.getDouble("precio"),
                         rs.getInt("stock"),
-                        rs.getInt("stockMinimo")
+                        rs.getInt("stockMinimo"),
+                        rs.getString("etiqueta")
+                    );
+                    lista.add(l);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return lista;
+    }
+
+
+    public List<Libro> findByEtiqueta(String etiqueta) {
+        List<Libro> lista = new ArrayList<>();
+        String sql = "SELECT * FROM libro WHERE etiqueta = ?";
+        try (Connection con = Conexion.getConexion();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, etiqueta);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Libro l = new Libro(
+                        rs.getInt("idLibro"),
+                        rs.getString("isbn"),
+                        rs.getString("titulo"),
+                        rs.getString("autor"),
+                        rs.getDouble("precio"),
+                        rs.getInt("stock"),
+                        rs.getInt("stockMinimo"),
+                        rs.getString("etiqueta")
                     );
                     lista.add(l);
                 }
