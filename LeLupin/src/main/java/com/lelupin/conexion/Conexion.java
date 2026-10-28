@@ -12,23 +12,19 @@ public class Conexion {
 
     private static Connection conexion = null;
 
-    private static final String HOST = "gateway01.ap-northeast-1.prod.aws.tidbcloud.com";
-    private static final String PORT = "4000";
-    private static final String DB_NAME = "lelupin";
-    private static final String USER = "2XC1gsiHF4wss75.root";
-    
-
-    private static final String PASSWORD = "V55HT5YmAHfi8PJ3"; 
+    private static final String HOST = System.getenv("DB_HOST") != null ? System.getenv("DB_HOST") : "gateway01.ap-northeast-1.prod.aws.tidbcloud.com";
+    private static final String PORT = System.getenv("DB_PORT") != null ? System.getenv("DB_PORT") : "4000";
+    private static final String DB_NAME = System.getenv("DB_NAME") != null ? System.getenv("DB_NAME") : "lelupin";
+    private static final String USER = System.getenv("DB_USER") != null ? System.getenv("DB_USER") : "2XC1gsiHF4wss75.root";
+    private static final String PASSWORD = System.getenv("DB_PASSWORD") != null ? System.getenv("DB_PASSWORD") : "V55HT5YmAHfi8PJ3";
 
     private Conexion() {}
 
     public static Connection getConexion() {
-
         try {
             if (conexion == null || conexion.isClosed()) {
                 Class.forName("com.mysql.cj.jdbc.Driver");
                 
-
                 String url = "jdbc:mysql://" + HOST + ":" + PORT + "/" + DB_NAME 
                         + "?useSSL=true&requireSSL=true&sslMode=VERIFY_IDENTITY&enabledTLSProtocols=TLSv1.2,TLSv1.3";
                 
