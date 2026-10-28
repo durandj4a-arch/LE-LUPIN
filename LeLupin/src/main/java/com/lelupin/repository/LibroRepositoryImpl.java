@@ -4,17 +4,30 @@
  */
 package com.lelupin.repository;
 
-/**
- *
- * @author Joshua
- */
 import com.lelupin.conexion.Conexion;
 import com.lelupin.model.Libro;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
 public class LibroRepositoryImpl implements ILibroRepository {
+
+    private Libro mapear(ResultSet rs) throws SQLException {
+        return new Libro(
+            rs.getInt("id_libro"),
+            rs.getString("isbn"),
+            rs.getString("titulo"),
+            rs.getString("autor"),
+            rs.getDouble("precio"),
+            rs.getInt("stock"),
+            rs.getInt("stock_minimo"),
+            rs.getString("etiqueta")
+        );
+    }
 
     @Override
     public Libro save(Libro libro) {
@@ -29,70 +42,50 @@ public class LibroRepositoryImpl implements ILibroRepository {
             ps.setInt(6, libro.getStockMinimo());
             ps.setString(7, libro.getEtiqueta());
             ps.executeUpdate();
-            
+
             try (ResultSet rs = ps.getGeneratedKeys()) {
                 if (rs.next()) {
                     libro.setIdLibro(rs.getInt(1));
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException("Error al guardar libro: " + e.getMessage(), e);
         }
         return libro;
     }
 
     @Override
     public Libro findById(int id) {
-        Libro libro = null;
         String sql = "SELECT * FROM libro WHERE id_libro = ?";
         try (Connection con = Conexion.getConexion();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, id);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    libro = new Libro(
-                        rs.getInt("id_libro"),
-                        rs.getString("isbn"),
-                        rs.getString("titulo"),
-                        rs.getString("autor"),
-                        rs.getDouble("precio"),
-                        rs.getInt("stock"),
-                        rs.getInt("stock_minimo"),
-                        rs.getString("etiqueta")
-                    );
+                    return mapear(rs);
                 }
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return libro;
+        return null;
     }
 
     @Override
     public Libro findByIsbn(String isbn) {
-        Libro libro = null;
         String sql = "SELECT * FROM libro WHERE isbn = ?";
         try (Connection con = Conexion.getConexion();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, isbn);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    libro = new Libro(
-                        rs.getInt("id_libro"),
-                        rs.getString("isbn"),
-                        rs.getString("titulo"),
-                        rs.getString("autor"),
-                        rs.getDouble("precio"),
-                        rs.getInt("stock"),
-                        rs.getInt("stock_minimo"),
-                        rs.getString("etiqueta")
-                    );
+                    return mapear(rs);
                 }
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return libro;
+        return null;
     }
 
     @Override
@@ -104,17 +97,7 @@ public class LibroRepositoryImpl implements ILibroRepository {
             ps.setInt(1, stockMinimo);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    Libro l = new Libro(
-                        rs.getInt("id_libro"),
-                        rs.getString("isbn"),
-                        rs.getString("titulo"),
-                        rs.getString("autor"),
-                        rs.getDouble("precio"),
-                        rs.getInt("stock"),
-                        rs.getInt("stock_minimo"),
-                        rs.getString("etiqueta")
-                    );
-                    lista.add(l);
+                    lista.add(mapear(rs));
                 }
             }
         } catch (SQLException e) {
@@ -131,17 +114,7 @@ public class LibroRepositoryImpl implements ILibroRepository {
              PreparedStatement ps = con.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
-                Libro l = new Libro(
-                    rs.getInt("id_libro"),
-                    rs.getString("isbn"),
-                    rs.getString("titulo"),
-                    rs.getString("autor"),
-                    rs.getDouble("precio"),
-                    rs.getInt("stock"),
-                    rs.getInt("stock_minimo"),
-                    rs.getString("etiqueta")
-                );
-                lista.add(l);
+                lista.add(mapear(rs));
             }
         } catch (SQLException e) {
             e.printStackTrace();

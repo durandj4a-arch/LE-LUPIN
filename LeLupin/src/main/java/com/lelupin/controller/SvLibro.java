@@ -25,13 +25,15 @@ public class SvLibro extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+
+        request.setCharacterEncoding("UTF-8");
+
         try {
             String isbn = request.getParameter("isbn");
             String titulo = request.getParameter("titulo");
             String autor = request.getParameter("autor");
             String etiqueta = request.getParameter("etiqueta");
-            
+
             double precio = Double.parseDouble(request.getParameter("precio"));
             int stock = Integer.parseInt(request.getParameter("stock"));
             int stockMinimo = Integer.parseInt(request.getParameter("stockMinimo"));
@@ -46,7 +48,6 @@ public class SvLibro extends HttpServlet {
             libro.setEtiqueta(etiqueta);
 
             libroRepo.save(libro);
-
 
             response.sendRedirect("bienvenido.jsp");
 
