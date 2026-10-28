@@ -18,7 +18,7 @@ public class LibroRepositoryImpl implements ILibroRepository {
 
     @Override
     public Libro save(Libro libro) {
-        String sql = "INSERT INTO libro (isbn, titulo, autor, precio, stock, stockMinimo, etiqueta) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO libro (isbn, titulo, autor, precio, stock, stock_minimo, etiqueta) VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (Connection con = Conexion.getConexion();
              PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, libro.getIsbn());
@@ -44,20 +44,20 @@ public class LibroRepositoryImpl implements ILibroRepository {
     @Override
     public Libro findById(int id) {
         Libro libro = null;
-        String sql = "SELECT * FROM libro WHERE idLibro = ?";
+        String sql = "SELECT * FROM libro WHERE id_libro = ?";
         try (Connection con = Conexion.getConexion();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, id);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     libro = new Libro(
-                        rs.getInt("idLibro"),
+                        rs.getInt("id_libro"),
                         rs.getString("isbn"),
                         rs.getString("titulo"),
                         rs.getString("autor"),
                         rs.getDouble("precio"),
                         rs.getInt("stock"),
-                        rs.getInt("stockMinimo"),
+                        rs.getInt("stock_minimo"),
                         rs.getString("etiqueta")
                     );
                 }
@@ -78,13 +78,13 @@ public class LibroRepositoryImpl implements ILibroRepository {
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     libro = new Libro(
-                        rs.getInt("idLibro"),
+                        rs.getInt("id_libro"),
                         rs.getString("isbn"),
                         rs.getString("titulo"),
                         rs.getString("autor"),
                         rs.getDouble("precio"),
                         rs.getInt("stock"),
-                        rs.getInt("stockMinimo"),
+                        rs.getInt("stock_minimo"),
                         rs.getString("etiqueta")
                     );
                 }
@@ -105,13 +105,13 @@ public class LibroRepositoryImpl implements ILibroRepository {
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     Libro l = new Libro(
-                        rs.getInt("idLibro"),
+                        rs.getInt("id_libro"),
                         rs.getString("isbn"),
                         rs.getString("titulo"),
                         rs.getString("autor"),
                         rs.getDouble("precio"),
                         rs.getInt("stock"),
-                        rs.getInt("stockMinimo"),
+                        rs.getInt("stock_minimo"),
                         rs.getString("etiqueta")
                     );
                     lista.add(l);
@@ -123,34 +123,6 @@ public class LibroRepositoryImpl implements ILibroRepository {
         return lista;
     }
 
-    public List<Libro> findByEtiqueta(String etiqueta) {
-        List<Libro> lista = new ArrayList<>();
-        String sql = "SELECT * FROM libro WHERE etiqueta = ?";
-        try (Connection con = Conexion.getConexion();
-             PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setString(1, etiqueta);
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    Libro l = new Libro(
-                        rs.getInt("idLibro"),
-                        rs.getString("isbn"),
-                        rs.getString("titulo"),
-                        rs.getString("autor"),
-                        rs.getDouble("precio"),
-                        rs.getInt("stock"),
-                        rs.getInt("stockMinimo"),
-                        rs.getString("etiqueta")
-                    );
-                    lista.add(l);
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return lista;
-    }
-
-    // <-- MÉTODO FALTANTE AÑADIDO AQUÍ -->
     @Override
     public List<Libro> findAll() {
         List<Libro> lista = new ArrayList<>();
@@ -160,13 +132,13 @@ public class LibroRepositoryImpl implements ILibroRepository {
              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 Libro l = new Libro(
-                    rs.getInt("idLibro"),
+                    rs.getInt("id_libro"),
                     rs.getString("isbn"),
                     rs.getString("titulo"),
                     rs.getString("autor"),
                     rs.getDouble("precio"),
                     rs.getInt("stock"),
-                    rs.getInt("stockMinimo"),
+                    rs.getInt("stock_minimo"),
                     rs.getString("etiqueta")
                 );
                 lista.add(l);

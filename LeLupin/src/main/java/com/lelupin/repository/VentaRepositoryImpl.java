@@ -21,13 +21,12 @@ public class VentaRepositoryImpl implements IVentaRepository {
     public boolean registrarVenta(Venta venta) {
         String sqlVenta = "INSERT INTO venta (cliente, fecha, total, estado) VALUES (?, NOW(), ?, 'ACTIVA')";
         String sqlDetalle = "INSERT INTO detalle_venta (id_venta, id_libro, cantidad, subtotal) VALUES (?, ?, ?, ?)";
-        String sqlUpdateStock = "UPDATE libro SET stock = stock - ? WHERE idLibro = ?";
+        String sqlUpdateStock = "UPDATE libro SET stock = stock - ? WHERE id_libro = ?";
         
         Connection con = null;
         try {
             con = Conexion.getConexion();
             con.setAutoCommit(false);
-
 
             PreparedStatement psVenta = con.prepareStatement(sqlVenta, Statement.RETURN_GENERATED_KEYS);
             psVenta.setString(1, venta.getCliente());
@@ -40,18 +39,15 @@ public class VentaRepositoryImpl implements IVentaRepository {
                 idVentaGenerado = rsKeys.getInt(1);
             }
 
-
             PreparedStatement psDetalle = con.prepareStatement(sqlDetalle);
             PreparedStatement psStock = con.prepareStatement(sqlUpdateStock);
 
             for (DetalleVenta det : venta.getDetalles()) {
-
                 psDetalle.setInt(1, idVentaGenerado);
                 psDetalle.setInt(2, det.getIdLibro());
                 psDetalle.setInt(3, det.getCantidad());
                 psDetalle.setDouble(4, det.getSubtotal());
                 psDetalle.executeUpdate();
-
 
                 psStock.setInt(1, det.getCantidad());
                 psStock.setInt(2, det.getIdLibro());
@@ -74,59 +70,6 @@ public class VentaRepositoryImpl implements IVentaRepository {
         }
     }
 
-
-    public boolean anularVenta(int idVenta) {
-        String sqlGetDetalles = "SELECT id_libro, cantidad FROM detalle_venta WHERE id_venta = ?";
-        String sqlAnular = "UPDATE venta SET estado = 'ANULADA' WHERE idVenta = ?";
-        String sqlDevolverStock = "UPDATE libro SET stock = stock + ? WHERE idLibro = ?";
-
-        Connection con = null;
-        try {
-            con = Conexion.getConexion();
-            con.setAutoCommit(false);
-
-
-            PreparedStatement psGet = con.prepareStatement(sqlGetDetalles);
-            psGet.setInt(1, idVenta);
-            ResultSet rs = psGet.executeQuery();
-
-            PreparedStatement psDevolver = con.prepareStatement(sqlDevolverStock);
-            while (rs.next()) {
-                int idLibro = rs.getInt("id_libro");
-                int cantidad = rs.getInt("cantidad");
-
-                psDevolver.setInt(1, cantidad);
-                psDevolver.setInt(2, idLibro);
-                psDevolver.executeUpdate();
-            }
-
-
-            PreparedStatement psAnular = con.prepareStatement(sqlAnular);
-            psAnular.setInt(1, idVenta);
-            psAnular.executeUpdate();
-
-            con.commit();
-            return true;
-
-        } catch (SQLException e) {
-            if (con != null) {
-                try { con.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
-            }
-            e.printStackTrace();
-            return false;
-        } finally {
-            if (con != null) {
-                try { con.close(); } catch (SQLException e) { e.printStackTrace(); }
-            }
-        }
-    }
-
-    @Override
-    public Venta buscarPorId(int idVenta) {
-
-        return null;
-    }
-
     @Override
     public List<Venta> listarVentas() {
         List<Venta> lista = new ArrayList<>();
@@ -136,7 +79,7 @@ public class VentaRepositoryImpl implements IVentaRepository {
              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 Venta v = new Venta();
-                v.setIdVenta(rs.getInt("idVenta"));
+                v.setIdVenta(rs.getInt("id_venta"));
                 v.setCliente(rs.getString("cliente"));
                 v.setFecha(rs.getTimestamp("fecha"));
                 v.setTotal(rs.getDouble("total"));
@@ -147,5 +90,10 @@ public class VentaRepositoryImpl implements IVentaRepository {
             e.printStackTrace();
         }
         return lista;
+    }
+
+    @Override
+    public Venta buscarPorId(int idVenta) {
+        return null;
     }
 }
