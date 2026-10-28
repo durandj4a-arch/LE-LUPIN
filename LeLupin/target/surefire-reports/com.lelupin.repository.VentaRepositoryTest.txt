@@ -1,8 +1,8 @@
 -------------------------------------------------------------------------------
 Test set: com.lelupin.repository.VentaRepositoryTest
 -------------------------------------------------------------------------------
-Tests run: 1, Failures: 1, Errors: 0, Skipped: 0, Time elapsed: 5.837 s <<< FAILURE! -- in com.lelupin.repository.VentaRepositoryTest
-com.lelupin.repository.VentaRepositoryTest.testRegistrarVenta -- Time elapsed: 5.701 s <<< FAILURE!
+Tests run: 1, Failures: 1, Errors: 0, Skipped: 0, Time elapsed: 5.565 s <<< FAILURE! -- in com.lelupin.repository.VentaRepositoryTest
+com.lelupin.repository.VentaRepositoryTest.testRegistrarVenta -- Time elapsed: 5.476 s <<< FAILURE!
 java.lang.AssertionError: La venta debió registrarse con éxito en TiDB Cloud
 	at org.junit.Assert.fail(Assert.java:89)
 	at org.junit.Assert.assertTrue(Assert.java:42)

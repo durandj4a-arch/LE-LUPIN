@@ -10,8 +10,6 @@ import java.sql.SQLException;
 
 public class Conexion {
 
-    private static Connection conexion = null;
-
     private static final String HOST = System.getenv("DB_HOST") != null ? System.getenv("DB_HOST") : "gateway01.ap-northeast-1.prod.aws.tidbcloud.com";
     private static final String PORT = System.getenv("DB_PORT") != null ? System.getenv("DB_PORT") : "4000";
     private static final String DB_NAME = System.getenv("DB_NAME") != null ? System.getenv("DB_NAME") : "lelupin";
@@ -21,20 +19,19 @@ public class Conexion {
     private Conexion() {}
 
     public static Connection getConexion() {
+        Connection conexion = null;
         try {
-            if (conexion == null || conexion.isClosed()) {
-                Class.forName("com.mysql.cj.jdbc.Driver");
-                
-                String url = "jdbc:mysql://" + HOST + ":" + PORT + "/" + DB_NAME 
-                        + "?useSSL=true&requireSSL=true&sslMode=VERIFY_IDENTITY&enabledTLSProtocols=TLSv1.2,TLSv1.3";
-                
-                conexion = DriverManager.getConnection(url, USER, PASSWORD);
-                System.out.println(">>> [Le Lupin] ¡CONEXIÓN EXITOSA A TIDB CLOUD! <<<");
-            }
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            
+            String url = "jdbc:mysql://" + HOST + ":" + PORT + "/" + DB_NAME 
+                    + "?useSSL=true&trustServerCertificate=true&allowPublicKeyRetrieval=true";
+            
+            conexion = DriverManager.getConnection(url, USER, PASSWORD);
+            System.out.println(">>> [Le Lupin] ¡CONEXIÓN EXITOSA A TIDB CLOUD! <<<");
         } catch (ClassNotFoundException e) {
-            System.err.println(">>> ERROR: Driver de MySQL no encontrado en las dependencias: " + e.getMessage());
+            System.err.println(">>> ERROR: Driver de MySQL no encontrado: " + e.getMessage());
         } catch (SQLException e) {
-            System.err.println(">>> ERROR DE SQL AL CONECTAR A TIDB:");
+            System.err.println(">>> ERROR DE SQL AL CONECTAR A TIDB: " + e.getMessage());
             e.printStackTrace();
         }
         return conexion;
