@@ -5,6 +5,20 @@
 --%>
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="com.lelupin.repository.LibroRepositoryImpl" %>
+<%@ page import="com.lelupin.repository.VentaRepositoryImpl" %>
+<%@ page import="com.lelupin.model.Libro" %>
+<%@ page import="com.lelupin.model.Venta" %>
+<%@ page import="java.util.List" %>
+
+<%
+    LibroRepositoryImpl libroRepo = new LibroRepositoryImpl();
+    List<Libro> listaLibros = libroRepo.findAll();
+
+    VentaRepositoryImpl ventaRepo = new VentaRepositoryImpl();
+    List<Venta> listaVentas = ventaRepo.listarVentas();
+%>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -47,7 +61,7 @@
             color: #16221f;
         }
         .main-container {
-            max-width: 950px;
+            max-width: 1000px;
             margin: 30px auto;
             padding: 30px;
             background: white;
@@ -61,12 +75,13 @@
             display: flex;
             border-bottom: 2px solid #16221f;
             margin-bottom: 25px;
+            gap: 5px;
         }
         .tab-btn {
             background: none;
             border: none;
-            padding: 12px 24px;
-            font-size: 0.95rem;
+            padding: 12px 20px;
+            font-size: 0.9rem;
             font-weight: bold;
             color: #666;
             cursor: pointer;
@@ -153,6 +168,30 @@
             font-size: 0.8rem;
             font-weight: bold;
         }
+        .badge-warning {
+            background-color: #e65100;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        .badge-danger {
+            background-color: #c62828;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        .badge-status {
+            background-color: #1565c0;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -168,6 +207,7 @@
             <button class="tab-btn active" onclick="showTab('catalogo')">📚 Catálogo de Libros</button>
             <button class="tab-btn" onclick="showTab('registrar-libro')">➕ Registrar Nuevo Libro</button>
             <button class="tab-btn" onclick="showTab('registrar-venta')">🛒 Registrar Venta</button>
+            <button class="tab-btn" onclick="showTab('historial-ventas')">📜 Historial de Ventas</button>
         </div>
 
         <div id="catalogo" class="tab-content active">
@@ -186,24 +226,35 @@
                     </tr>
                 </thead>
                 <tbody>
+                    <% 
+                        if (listaLibros != null && !listaLibros.isEmpty()) {
+                            for (Libro lib : listaLibros) {
+                    %>
                     <tr>
-                        <td><strong>1</strong></td>
-                        <td>978-8420653281</td>
-                        <td>Arsène Lupin, caballero ladrón</td>
-                        <td>Maurice Leblanc</td>
-                        <td>Novela</td>
-                        <td>S/ 49.90</td>
-                        <td><span class="badge-stock">15 un.</span></td>
+                        <td><strong><%= lib.getIdLibro() %></strong></td>
+                        <td><%= lib.getIsbn() %></td>
+                        <td><%= lib.getTitulo() %></td>
+                        <td><%= lib.getAutor() %></td>
+                        <td><%= lib.getEtiqueta() != null ? lib.getEtiqueta() : "Sin Género" %></td>
+                        <td>S/ <%= String.format("%.2f", lib.getPrecio()) %></td>
+                        <td>
+                            <% if (lib.getStock() <= 0) { %>
+                                <span class="badge-danger">Agotado (0)</span>
+                            <% } else if (lib.getStock() <= lib.getStockMinimo()) { %>
+                                <span class="badge-warning"><%= lib.getStock() %> un. (Bajo)</span>
+                            <% } else { %>
+                                <span class="badge-stock"><%= lib.getStock() %> un.</span>
+                            <% } %>
+                        </td>
                     </tr>
+                    <% 
+                            }
+                        } else {
+                    %>
                     <tr>
-                        <td><strong>2</strong></td>
-                        <td>978-8499890982</td>
-                        <td>La naranja mecánica</td>
-                        <td>Anthony Burgess</td>
-                        <td>Novela</td>
-                        <td>S/ 42.50</td>
-                        <td><span class="badge-stock">10 un.</span></td>
+                        <td colspan="7" style="text-align: center; color: #888;">No hay libros registrados en el inventario.</td>
                     </tr>
+                    <% } %>
                 </tbody>
             </table>
         </div>
@@ -235,10 +286,10 @@
                         <label>GÉNERO / ETIQUETA</label>
                         <select name="etiqueta" required>
                             <option value="" disabled selected>Seleccione un género</option>
-                            <option value="manga">Manga</option>
-                            <option value="comic">Cómic</option>
-                            <option value="drama">Drama</option>
-                            <option value="novela">Novela</option>
+                            <option value="Manga">Manga</option>
+                            <option value="Cómic">Cómic</option>
+                            <option value="Drama">Drama</option>
+                            <option value="Novela">Novela</option>
                         </select>
                     </div>
                 </div>
@@ -257,8 +308,8 @@
         </div>
 
         <div id="registrar-venta" class="tab-content">
-            <h2>Módulo de Registro de Ventas (Cabecera y Detalle)</h2>
-            <p>Complete los datos para procesar una nueva venta y emitir la transacción.</p>
+            <h2>Módulo de Registro de Ventas</h2>
+            <p>Complete los datos para procesar una nueva venta y actualizar el stock automáticamente.</p>
             <form action="SvVenta" method="POST">
                 <div class="form-group">
                     <label>NOMBRE DEL CLIENTE</label>
@@ -281,6 +332,44 @@
                 <button type="submit" class="btn-submit">Registrar Venta en Sistema</button>
             </form>
         </div>
+
+        <div id="historial-ventas" class="tab-content">
+            <h2>Historial de Ventas Registradas</h2>
+            <p>Registro de transacciones generadas en el sistema.</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID VENTA</th>
+                        <th>CLIENTE</th>
+                        <th>FECHA</th>
+                        <th>TOTAL (S/)</th>
+                        <th>ESTADO</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% 
+                        if (listaVentas != null && !listaVentas.isEmpty()) {
+                            for (Venta v : listaVentas) {
+                    %>
+                    <tr>
+                        <td><strong>#<%= v.getIdVenta() %></strong></td>
+                        <td><%= v.getCliente() %></td>
+                        <td><%= v.getFecha() != null ? v.getFecha().toString() : "Reciente" %></td>
+                        <td>S/ <%= String.format("%.2f", v.getTotal()) %></td>
+                        <td><span class="badge-status"><%= v.getEstado() != null ? v.getEstado() : "ACTIVA" %></span></td>
+                    </tr>
+                    <% 
+                            }
+                        } else {
+                    %>
+                    <tr>
+                        <td colspan="5" style="text-align: center; color: #888;">No se han registrado ventas aún.</td>
+                    </tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+
     </div>
 
     <script>
