@@ -100,7 +100,27 @@
         p {
             color: #666;
             font-size: 0.9rem;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
+        }
+
+        .alert-error {
+            background-color: #fdecea;
+            color: #b71c1c;
+            border-left: 4px solid #c62828;
+            padding: 10px 14px;
+            font-size: 0.85rem;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+
+        .alert-info {
+            background-color: #e8f5e9;
+            color: #1b5e20;
+            border-left: 4px solid #2e7d32;
+            padding: 10px 14px;
+            font-size: 0.85rem;
+            margin-bottom: 20px;
+            border-radius: 4px;
         }
 
         label {
@@ -122,12 +142,12 @@
         }
 
         input:focus {
-            border-bottom: 2px solid #000;
+            border-bottom: 2px solid #16221f;
         }
 
         button {
             width: 100%;
-            background-color: #1a1a1a;
+            background-color: #16221f;
             color: white;
             border: none;
             padding: 14px;
@@ -135,11 +155,12 @@
             cursor: pointer;
             margin-top: 10px;
             letter-spacing: 1px;
+            border-radius: 4px;
             transition: background 0.2s;
         }
 
         button:hover {
-            background-color: #333;
+            background-color: #2b3d38;
         }
     </style>
 </head>
@@ -162,11 +183,19 @@
                 <span style="font-size: 0.7rem; letter-spacing: 2px; color: #777; font-weight: bold;">ÁREA DE VENDEDORES</span>
                 <h2>Bienvenido</h2>
                 <p>Inicia sesión para volver a tus libros.</p>
-                
+
+                <% if ("1".equals(request.getParameter("error"))) { %>
+                    <div class="alert-error">
+                        Usuario o contraseña incorrectos. Verifique sus credenciales.
+                    </div>
+                <% } else if ("1".equals(request.getParameter("logout"))) { %>
+                    <div class="alert-info">
+                        Sesión cerrada correctamente.
+                    </div>
+                <% } %>
 
                 <form action="SvLogin" method="POST">
                     <label>USUARIO</label><br>
-                    <!-- Cambiado a type="text" y name="username" para calzar con la BD -->
                     <input type="text" name="username" placeholder="admin" value="admin" required><br>
                     
                     <label>CONTRASEÑA</label><br>
