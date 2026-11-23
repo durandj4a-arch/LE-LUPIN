@@ -22,7 +22,7 @@ public class VentaRepositoryImpl implements IVentaRepository {
         String sqlVenta = "INSERT INTO venta (cliente, fecha, total, estado) VALUES (?, NOW(), ?, 'ACTIVA')";
         String sqlDetalle = "INSERT INTO detalle_venta (id_venta, id_libro, cantidad, subtotal) VALUES (?, ?, ?, ?)";
         String sqlUpdateStock = "UPDATE libro SET stock = stock - ? WHERE id_libro = ?";
-        
+
         Connection con = null;
         try {
             con = Conexion.getConexion();
@@ -65,7 +65,12 @@ public class VentaRepositoryImpl implements IVentaRepository {
             return false;
         } finally {
             if (con != null) {
-                try { con.close(); } catch (SQLException e) { e.printStackTrace(); }
+                try {
+                    con.setAutoCommit(true);
+                    con.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
@@ -94,6 +99,80 @@ public class VentaRepositoryImpl implements IVentaRepository {
 
     @Override
     public Venta buscarPorId(int idVenta) {
+        String sql = "SELECT * FROM venta WHERE id_venta = ?";
+        try (Connection con = Conexion.getConexion();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, idVenta);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    Venta v = new Venta();
+                    v.setIdVenta(rs.getInt("id_venta"));
+                    v.setCliente(rs.getString("cliente"));
+                    v.setFecha(rs.getTimestamp("fecha"));
+                    v.setTotal(rs.getDouble("total"));
+                    v.setEstado(rs.getString("estado"));
+                    return v;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return null;
+    }
+
+    @Override
+    public boolean actualizar(Venta venta) {
+        String sql = "UPDATE venta SET cliente = ?, total = ?, estado = ? WHERE id_venta = ?";
+        try (Connection con = Conexion.getConexion();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, venta.getCliente());
+            ps.setDouble(2, venta.getTotal());
+            ps.setString(3, venta.getEstado());
+            ps.setInt(4, venta.getIdVenta());
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    @Override
+    public boolean eliminar(int idVenta) {
+        String sqlDeleteDetalle = "DELETE FROM detalle_venta WHERE id_venta = ?";
+        String sqlDeleteVenta = "DELETE FROM venta WHERE id_venta = ?";
+        Connection con = null;
+        try {
+            con = Conexion.getConexion();
+            con.setAutoCommit(false);
+
+            try (PreparedStatement psDet = con.prepareStatement(sqlDeleteDetalle)) {
+                psDet.setInt(1, idVenta);
+                psDet.executeUpdate();
+            }
+
+            int filasAfectadas;
+            try (PreparedStatement psVen = con.prepareStatement(sqlDeleteVenta)) {
+                psVen.setInt(1, idVenta);
+                filasAfectadas = psVen.executeUpdate();
+            }
+
+            con.commit();
+            return filasAfectadas > 0;
+        } catch (SQLException e) {
+            if (con != null) {
+                try { con.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
+            }
+            e.printStackTrace();
+            return false;
+        } finally {
+            if (con != null) {
+                try {
+                    con.setAutoCommit(true);
+                    con.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 }

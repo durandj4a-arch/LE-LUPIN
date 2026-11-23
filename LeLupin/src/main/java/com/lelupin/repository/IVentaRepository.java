@@ -15,4 +15,6 @@ public interface IVentaRepository {
     boolean registrarVenta(Venta venta);
     Venta buscarPorId(int idVenta);
     List<Venta> listarVentas();
+    boolean actualizar(Venta venta);
+    boolean eliminar(int idVenta);
 }

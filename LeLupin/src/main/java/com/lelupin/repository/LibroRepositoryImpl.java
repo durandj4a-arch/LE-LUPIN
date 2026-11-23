@@ -121,4 +121,64 @@ public class LibroRepositoryImpl implements ILibroRepository {
         }
         return lista;
     }
+
+    @Override
+    public boolean actualizar(Libro libro) {
+        String sql = "UPDATE libro SET isbn = ?, titulo = ?, autor = ?, precio = ?, stock = ?, stock_minimo = ?, etiqueta = ? WHERE id_libro = ?";
+        try (Connection con = Conexion.getConexion();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, libro.getIsbn());
+            ps.setString(2, libro.getTitulo());
+            ps.setString(3, libro.getAutor());
+            ps.setDouble(4, libro.getPrecio());
+            ps.setInt(5, libro.getStock());
+            ps.setInt(6, libro.getStockMinimo());
+            ps.setString(7, libro.getEtiqueta());
+            ps.setInt(8, libro.getIdLibro());
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    @Override
+    public boolean eliminar(int idLibro) {
+        String sqlDeleteDetalle = "DELETE FROM detalle_venta WHERE id_libro = ?";
+        String sqlDeleteLibro = "DELETE FROM libro WHERE id_libro = ?";
+        Connection con = null;
+        try {
+            con = Conexion.getConexion();
+            con.setAutoCommit(false);
+
+            try (PreparedStatement psDet = con.prepareStatement(sqlDeleteDetalle)) {
+                psDet.setInt(1, idLibro);
+                psDet.executeUpdate();
+            }
+
+            int filasAfectadas;
+            try (PreparedStatement psLib = con.prepareStatement(sqlDeleteLibro)) {
+                psLib.setInt(1, idLibro);
+                filasAfectadas = psLib.executeUpdate();
+            }
+
+            con.commit();
+            return filasAfectadas > 0;
+        } catch (SQLException e) {
+            if (con != null) {
+                try { con.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
+            }
+            e.printStackTrace();
+            return false;
+        } finally {
+            if (con != null) {
+                try {
+                    con.setAutoCommit(true);
+                    con.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
 }

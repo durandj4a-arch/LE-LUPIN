@@ -16,7 +16,7 @@ public interface ILibroRepository {
     Libro findById(int id);
     Libro findByIsbn(String isbn);
     List<Libro> findByStockLessThan(int stockMinimo);
-    
-
     List<Libro> findAll();
+    boolean actualizar(Libro libro);
+    boolean eliminar(int idLibro);
 }

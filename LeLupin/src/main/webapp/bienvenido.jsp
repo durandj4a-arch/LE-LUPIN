@@ -1,9 +1,3 @@
-<%-- 
-    Document   : bienvenido
-    Created on : 7 oct. 2026, 11:53:10 p. m.
-    Author     : Joshua
---%>
-
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="com.lelupin.repository.LibroRepositoryImpl" %>
 <%@ page import="com.lelupin.repository.VentaRepositoryImpl" %>
@@ -112,7 +106,6 @@
         .tab-content.active {
             display: block;
         }
-        /* Barra de filtros */
         .filter-bar {
             display: flex;
             gap: 15px;
@@ -260,7 +253,6 @@
             font-size: 0.8rem;
             font-weight: 600;
         }
-        /* Botones de acción en tabla */
         .actions-cell {
             display: flex;
             gap: 6px;
@@ -292,7 +284,6 @@
         .btn-delete:hover {
             background-color: #8e0000;
         }
-        /* Ventanas Modales para Editar */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -342,22 +333,20 @@
     <div class="main-container">
 
         <% if (msg != null && !msg.isEmpty()) { %>
-            <div class="alert-banner">✅ <%= msg %></div>
+            <div class="alert-banner"><%= msg %></div>
         <% } %>
 
         <div class="nav-tabs">
-            <button class="tab-btn active" onclick="showTab('catalogo', this)">📚 Catálogo de Libros</button>
-            <button class="tab-btn" onclick="showTab('registrar-libro', this)">➕ Registrar Nuevo Libro</button>
-            <button class="tab-btn" onclick="showTab('registrar-venta', this)">🛒 Registrar Venta</button>
-            <button class="tab-btn" onclick="showTab('historial-ventas', this)">📜 Historial de Ventas</button>
+            <button type="button" class="tab-btn active" onclick="showTab('catalogo', this)">Catálogo de Libros</button>
+            <button type="button" class="tab-btn" onclick="showTab('registrar-libro', this)">Registrar Nuevo Libro</button>
+            <button type="button" class="tab-btn" onclick="showTab('registrar-venta', this)">Registrar Venta</button>
+            <button type="button" class="tab-btn" onclick="showTab('historial-ventas', this)">Historial de Ventas</button>
         </div>
 
-        <!-- ==================== PESTAÑA 1: CATÁLOGO DE LIBROS ==================== -->
         <div id="catalogo" class="tab-content active">
             <h2>Catálogo de Libros Disponibles</h2>
             <p>Lista de ejemplares registrados en la base de datos de TiDB Cloud. Filtre por etiqueta o busque por título/autor.</p>
 
-            <!-- Chips rápidos de etiquetas -->
             <div class="filter-tags">
                 <button type="button" class="tag-chip active" onclick="filtrarPorChip('TODOS', this)">Todos</button>
                 <button type="button" class="tag-chip" onclick="filtrarPorChip('Manga', this)">Manga</button>
@@ -367,7 +356,6 @@
                 <button type="button" class="tag-chip" onclick="filtrarPorChip('Sin Género', this)">Sin Género</button>
             </div>
 
-            <!-- Barra de búsqueda combinada -->
             <div class="filter-bar">
                 <div class="filter-item">
                     <label>BUSCAR POR TÍTULO, AUTOR O ISBN</label>
@@ -400,11 +388,15 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <% 
+                    <%
                         if (listaLibros != null && !listaLibros.isEmpty()) {
                             for (Libro lib : listaLibros) {
-                                String etiquetaActual = (lib.getEtiqueta() != null && !lib.getEtiqueta().trim().isEmpty()) 
+                                String etiquetaActual = (lib.getEtiqueta() != null && !lib.getEtiqueta().trim().isEmpty())
                                                         ? lib.getEtiqueta() : "Sin Género";
+                                String isbnEsc = lib.getIsbn() != null ? lib.getIsbn().replace("\\", "\\\\").replace("'", "\\'") : "";
+                                String tituloEsc = lib.getTitulo() != null ? lib.getTitulo().replace("\\", "\\\\").replace("'", "\\'") : "";
+                                String autorEsc = lib.getAutor() != null ? lib.getAutor().replace("\\", "\\\\").replace("'", "\\'") : "";
+                                String confirmTitulo = lib.getTitulo() != null ? lib.getTitulo().replace("'", "").replace("\"", "") : "";
                     %>
                     <tr data-etiqueta="<%= etiquetaActual %>">
                         <td><strong><%= lib.getIdLibro() %></strong></td>
@@ -427,25 +419,25 @@
                                 <button type="button" class="btn-edit"
                                     onclick="abrirModalEditarLibro(
                                         '<%= lib.getIdLibro() %>',
-                                        '<%= lib.getIsbn().replace("'", "\\'") %>',
-                                        '<%= lib.getTitulo().replace("'", "\\'") %>',
-                                        '<%= lib.getAutor().replace("'", "\\'") %>',
+                                        '<%= isbnEsc %>',
+                                        '<%= tituloEsc %>',
+                                        '<%= autorEsc %>',
                                         '<%= etiquetaActual %>',
                                         '<%= lib.getPrecio() %>',
                                         '<%= lib.getStock() %>',
                                         '<%= lib.getStockMinimo() %>'
-                                    )">✏️ Editar</button>
+                                    )">Editar</button>
 
                                 <form action="SvLibro" method="POST" style="margin:0;"
-                                      onsubmit="return confirm('¿Seguro que deseas eliminar el libro «<%= lib.getTitulo().replace("'", "") %>»?');">
+                                      onsubmit="return confirm('¿Seguro que deseas eliminar el libro «<%= confirmTitulo %>»?');">
                                     <input type="hidden" name="accion" value="eliminar">
                                     <input type="hidden" name="idLibro" value="<%= lib.getIdLibro() %>">
-                                    <button type="submit" class="btn-delete">🗑️ Borrar</button>
+                                    <button type="submit" class="btn-delete">Borrar</button>
                                 </form>
                             </div>
                         </td>
                     </tr>
-                    <% 
+                    <%
                             }
                         } else {
                     %>
@@ -457,7 +449,6 @@
             </table>
         </div>
 
-        <!-- ==================== PESTAÑA 2: REGISTRAR NUEVO LIBRO ==================== -->
         <div id="registrar-libro" class="tab-content">
             <h2>Registrar Nuevo Libro al Catálogo</h2>
             <p>Ingrese los datos bibliográficos para añadir una obra al inventario.</p>
@@ -507,7 +498,6 @@
             </form>
         </div>
 
-        <!-- ==================== PESTAÑA 3: REGISTRAR VENTA ==================== -->
         <div id="registrar-venta" class="tab-content">
             <h2>Módulo de Registro de Ventas</h2>
             <p>Complete los datos para procesar una nueva venta y actualizar el stock automáticamente.</p>
@@ -546,7 +536,6 @@
             </form>
         </div>
 
-        <!-- ==================== PESTAÑA 4: HISTORIAL DE VENTAS ==================== -->
         <div id="historial-ventas" class="tab-content">
             <h2>Historial de Ventas Registradas</h2>
             <p>Registro de transacciones generadas en el sistema. Puede modificar o eliminar ventas registradas.</p>
@@ -578,10 +567,11 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <% 
+                    <%
                         if (listaVentas != null && !listaVentas.isEmpty()) {
                             for (Venta v : listaVentas) {
                                 String estadoVenta = v.getEstado() != null ? v.getEstado() : "ACTIVA";
+                                String clienteEsc = v.getCliente() != null ? v.getCliente().replace("\\", "\\\\").replace("'", "\\'") : "";
                     %>
                     <tr data-estado="<%= estadoVenta %>">
                         <td><strong>#<%= v.getIdVenta() %></strong></td>
@@ -598,21 +588,21 @@
                                 <button type="button" class="btn-edit"
                                     onclick="abrirModalEditarVenta(
                                         '<%= v.getIdVenta() %>',
-                                        '<%= v.getCliente().replace("'", "\\'") %>',
+                                        '<%= clienteEsc %>',
                                         '<%= v.getTotal() %>',
                                         '<%= estadoVenta %>'
-                                    )">✏️ Editar</button>
+                                    )">Editar</button>
 
                                 <form action="SvVenta" method="POST" style="margin:0;"
                                       onsubmit="return confirm('¿Seguro que deseas eliminar la venta #<%= v.getIdVenta() %>?');">
                                     <input type="hidden" name="accion" value="eliminar">
                                     <input type="hidden" name="idVenta" value="<%= v.getIdVenta() %>">
-                                    <button type="submit" class="btn-delete">🗑️ Borrar</button>
+                                    <button type="submit" class="btn-delete">Borrar</button>
                                 </form>
                             </div>
                         </td>
                     </tr>
-                    <% 
+                    <%
                             }
                         } else {
                     %>
@@ -626,7 +616,6 @@
 
     </div>
 
-    <!-- ==================== MODAL EDITAR LIBRO ==================== -->
     <div id="modalEditarLibro" class="modal-overlay">
         <div class="modal-box">
             <div class="modal-header">
@@ -682,7 +671,6 @@
         </div>
     </div>
 
-    <!-- ==================== MODAL EDITAR VENTA ==================== -->
     <div id="modalEditarVenta" class="modal-overlay">
         <div class="modal-box">
             <div class="modal-header">
@@ -724,7 +712,6 @@
             btnElement.classList.add('active');
         }
 
-        // Filtro por chips de etiqueta
         function filtrarPorChip(etiqueta, chipBtn) {
             document.querySelectorAll('.tag-chip').forEach(c => c.classList.remove('active'));
             chipBtn.classList.add('active');
@@ -732,7 +719,6 @@
             filtrarLibros();
         }
 
-        // Filtro combinado de libros (texto + etiqueta)
         function filtrarLibros() {
             const texto = document.getElementById('buscadorLibros').value.toLowerCase();
             const etiquetaSeleccionada = document.getElementById('filtroEtiqueta').value;
@@ -750,7 +736,6 @@
             });
         }
 
-        // Filtro de ventas
         function filtrarVentas() {
             const texto = document.getElementById('buscadorVentas').value.toLowerCase();
             const estadoSeleccionado = document.getElementById('filtroEstadoVenta').value;
@@ -768,7 +753,6 @@
             });
         }
 
-        // Cálculo automático en Registrar Venta
         function calcularTotalVenta() {
             const select = document.getElementById('selectLibroVenta');
             const opcion = select.options[select.selectedIndex];
@@ -777,7 +761,6 @@
             document.getElementById('totalVenta').value = (precio * cantidad).toFixed(2);
         }
 
-        // Modales
         function abrirModalEditarLibro(id, isbn, titulo, autor, etiqueta, precio, stock, stockMin) {
             document.getElementById('lblIdLibroModal').textContent = id;
             document.getElementById('editIdLibro').value = id;
@@ -808,7 +791,20 @@
             if (e.target.classList.contains('modal-overlay')) {
                 e.target.style.display = 'none';
             }
-        }
+        };
+
+        window.addEventListener('DOMContentLoaded', function () {
+            const params = new URLSearchParams(window.location.search);
+            const tabParam = params.get('tab');
+            if (tabParam) {
+                const targetContent = document.getElementById(tabParam);
+                const targetBtn = Array.from(document.querySelectorAll('.tab-btn'))
+                    .find(btn => btn.getAttribute('onclick') && btn.getAttribute('onclick').includes("'" + tabParam + "'"));
+                if (targetContent && targetBtn) {
+                    showTab(tabParam, targetBtn);
+                }
+            }
+        });
     </script>
 </body>
 </html>
