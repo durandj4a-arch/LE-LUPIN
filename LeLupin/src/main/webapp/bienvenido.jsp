@@ -361,17 +361,6 @@
                     <label>BUSCAR POR TÍTULO, AUTOR O ISBN</label>
                     <input type="text" id="buscadorLibros" onkeyup="filtrarLibros()" placeholder="Ej. Arsène Lupin, Alan Moore, 978...">
                 </div>
-                <div class="filter-item" style="max-width: 240px;">
-                    <label>FILTRAR POR ETIQUETA / GÉNERO</label>
-                    <select id="filtroEtiqueta" onchange="filtrarLibros()">
-                        <option value="TODOS">Todas las etiquetas</option>
-                        <option value="Manga">Manga</option>
-                        <option value="Cómic">Cómic</option>
-                        <option value="Novela">Novela</option>
-                        <option value="Drama">Drama</option>
-                        <option value="Sin Género">Sin Género</option>
-                    </select>
-                </div>
             </div>
 
             <table id="tablaLibros">
@@ -704,6 +693,8 @@
     </div>
 
     <script>
+        let etiquetaActiva = 'TODOS';
+
         function showTab(tabId, btnElement) {
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -715,13 +706,12 @@
         function filtrarPorChip(etiqueta, chipBtn) {
             document.querySelectorAll('.tag-chip').forEach(c => c.classList.remove('active'));
             chipBtn.classList.add('active');
-            document.getElementById('filtroEtiqueta').value = etiqueta;
+            etiquetaActiva = etiqueta;
             filtrarLibros();
         }
 
         function filtrarLibros() {
             const texto = document.getElementById('buscadorLibros').value.toLowerCase();
-            const etiquetaSeleccionada = document.getElementById('filtroEtiqueta').value;
             const filas = document.querySelectorAll('#tablaLibros tbody tr');
 
             filas.forEach(fila => {
@@ -730,7 +720,7 @@
                 const contenidoFila = fila.textContent.toLowerCase();
 
                 const coincideTexto = contenidoFila.includes(texto);
-                const coincideEtiqueta = (etiquetaSeleccionada === 'TODOS') || (etiquetaFila === etiquetaSeleccionada);
+                const coincideEtiqueta = (etiquetaActiva === 'TODOS') || (etiquetaFila === etiquetaActiva);
 
                 fila.style.display = (coincideTexto && coincideEtiqueta) ? '' : 'none';
             });
